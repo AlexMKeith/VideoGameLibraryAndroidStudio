@@ -32,4 +32,9 @@ public class VideoGame {
         public void setGameTitle(String gameTitle) { this.gameTitle = gameTitle; }
         public String getGameGenre() { return gameGenre; }
         public void setGameGenre(String gameGenre) { this.gameGenre = gameGenre; }
+        public boolean getIsCheckedOut() { return isCheckedOut; }
+        public void setIsCheckedOut(boolean isCheckedOut) { this.isCheckedOut = isCheckedOut; }
+        public Date getDate() {return date;}
+        public void setDate(Date date) { this.date = date; }
+
 }

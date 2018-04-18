@@ -20,6 +20,7 @@ public class MainActivity extends AppCompatActivity implements Adapter.AdapterCa
     private Adapter videoGameAdapter;
     private List<VideoGame> videoGameList;
     private LinearLayoutManager linearLayoutManager;
+    private AddGameFragment addGameFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,9 +41,14 @@ public class MainActivity extends AppCompatActivity implements Adapter.AdapterCa
     }
     @OnClick(R.id.add_game_button)
     protected void addGameButtonClicked() {
-        AddGameFragment addGameFragment = AddGameFragment.newInstance();
+        addGameFragment = AddGameFragment.newInstance();
         addGameFragment.attachParent(this);
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_holder, addGameFragment).commit();
 
+    }
+    @Override
+    public void addCLicked() {
+        getSupportFragmentManager().beginTransaction().remove(addGameFragment);
+        videoGameAdapter.updateList(videoGameDatabase.videoGameDao().getVideoGame();
     }
 }

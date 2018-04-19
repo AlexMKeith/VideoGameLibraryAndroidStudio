@@ -16,10 +16,13 @@ public interface VideoGameDao {
     //Allows us to get all videogame, Allows us to add a single game to the list, Allows us to update the values of an existing game, Allows us to delete a game from the library
     @Query("SELECT * FROM videogame")
     List<VideoGame> getVideoGames();
+
     @Insert
     void addVideoGame(VideoGame videoGame);
+
     @Update
     void updateVideoGame(VideoGame videoGame);
+
     @Delete
     void deleteVideoGame(VideoGame videoGame);
 }

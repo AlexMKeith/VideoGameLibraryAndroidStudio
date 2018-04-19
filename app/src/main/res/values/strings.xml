@@ -3,4 +3,6 @@
     <string name="game_name">Game Name %1$s</string>
     <string name="due_date">Due date %1$s</string>
     <string name="game_genre">Game genre %1$s</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 </resources>

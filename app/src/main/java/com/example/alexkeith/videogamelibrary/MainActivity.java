@@ -1,9 +1,15 @@
 package com.example.alexkeith.videogamelibrary;
 
+import android.content.Context;
+import android.content.DialogInterface;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.widget.Toast;
+
+import com.example.alexkeith.videogamelibrary.AddGameFragment.ActivityCallback;
 
 import java.util.List;
 
@@ -46,9 +52,82 @@ public class MainActivity extends AppCompatActivity implements Adapter.AdapterCa
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_holder, addGameFragment).commit();
 
     }
+
     @Override
-    public void addCLicked() {
-        getSupportFragmentManager().beginTransaction().remove(addGameFragment);
-        videoGameAdapter.updateList(videoGameDatabase.videoGameDao().getVideoGame();
+    public Context getContext() {
+        return getApplicationContext();
+    }
+
+    @Override
+    public void addClicked() {
+        getSupportFragmentManager().beginTransaction().remove(addGameFragment).commit();
+        videoGameAdapter.updateList(videoGameDatabase.videoGameDao().getVideoGames());
+    }
+    @Override
+    public void rowClicked(VideoGame videoGame) {
+        if(videoGame.isCheckedOut()) {
+            checkGameBackIn(videoGame);
+        } else {
+            checkGameOut(videoGame);
+        }
+    }
+
+    @Override
+    public void rowLongClicked(final VideoGame videoGame) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Delete game?").setMessage("Are you sure you would like to delete this game?").setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                videoGameDatabase.videoGameDao().deleteVideoGame(videoGame);
+                videoGameAdapter.updateList(videoGameDatabase.videoGameDao().getVideoGames());
+                Toast.makeText(MainActivity.this, "Game deleted", Toast.LENGTH_LONG).show();
+            }
+        })
+                .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .setIcon(android.R.drawable.ic_dialog_alert).show();
+    }
+
+    private void checkGameBackIn(final VideoGame videoGame) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Check-in Game?").setMessage("Are you sure you want to check in this game?").setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+            @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                videoGame.setCheckedOut(false);
+                videoGameDatabase.videoGameDao().updateVideoGame(videoGame);
+                videoGameAdapter.updateList(videoGameDatabase.videoGameDao().getVideoGames());
+                Toast.makeText(MainActivity.this, "Game is Checked in!", Toast.LENGTH_LONG).show();
+            }
+        })
+                .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .setIcon(android.R.drawable.ic_dialog_alert).show();
+    }
+    private void checkGameOut(final VideoGame videoGame) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Check out game?").setMessage("Are you sure you want to check this game out?").setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                videoGame.setCheckedOut(true);
+                videoGameDatabase.videoGameDao().updateVideoGame(videoGame);
+                videoGameAdapter.updateList(videoGameDatabase.videoGameDao().getVideoGames());
+                Toast.makeText(MainActivity.this, "Game is checked out!", Toast.LENGTH_LONG).show();
+            }
+        })
+                .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .setIcon(android.R.drawable.ic_dialog_alert).show();
     }
 }

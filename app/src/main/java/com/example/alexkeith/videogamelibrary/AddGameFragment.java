@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import java.util.Date;
@@ -20,9 +21,9 @@ public class AddGameFragment extends Fragment {
     private ActivityCallback activityCallback;
     private VideoGameDatabase videoGameDatabase;
     @BindView(R.id.add_game_title_editText)
-    private String gameTitle;
+    protected EditText gameTitle;
     @BindView(R.id.add_game_genre_editText)
-    private String genre;
+    protected EditText genre;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -51,9 +52,9 @@ public class AddGameFragment extends Fragment {
         if (gameTitle.getText().toString().isEmpty() || genre.getText().toString().isEmpty()) {
             Toast.makeText(getActivity(), "Please input all options.", Toast.LENGTH_LONG).show();
         } else {
-            String gameTitle = gameTitle.getText().toString();
-            String genre = genre.getText().toString();
-            addGameToDatabase(gameTitle, genre);
+            String title = gameTitle.getText().toString();
+            String gameGenre = genre.getText().toString();
+            addGameToDatabase(title, gameGenre);
             Toast.makeText(getActivity(), "Game Added!", Toast.LENGTH_LONG).show();
         }
     }
@@ -67,6 +68,5 @@ public class AddGameFragment extends Fragment {
     }
     public interface ActivityCallback {
         void addClicked();
-//        @BindView()
     }
 }

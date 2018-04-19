@@ -1,5 +1,6 @@
 package com.example.alexkeith.videogamelibrary;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -8,7 +9,11 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -22,7 +27,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
     private List<VideoGame> videoGamesList;
     private AdapterCallback adapterCallback;
 
-    public Adapter(List<VideoGame> videoGamesList) {
+    public Adapter(List<VideoGame> videoGamesList, AdapterCallback adapterCallback) {
         this.videoGamesList = videoGamesList;
         this.adapterCallback = adapterCallback;
     }
@@ -37,8 +42,8 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         holder.bindGame(videoGamesList.get(position));
-        holder.itemView.setOnClickListener(holder.onClick(videoGamesList.get(position));
-        holder.itemView.setOnLongClickListener();
+        holder.itemView.setOnClickListener(holder.onClick(videoGamesList.get(position)));
+        holder.itemView.setOnLongClickListener(holder.onLongClick(videoGamesList.get(position)));
     }
 
     @Override
@@ -50,7 +55,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
         notifyDataSetChanged();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class ViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.item_row_layout)
         protected RelativeLayout rowLayout;
         @BindView(R.id.item_title)
@@ -59,33 +64,59 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
         protected TextView gameDate;
         @BindView(R.id.item_genre)
         protected TextView gameGenre;
-//        private TextView gameName;
-//        private TextView gameGenre;
-//        private TextView gameDate;
+
 
 
         public ViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
-            gameTitle = itemView.findViewById(R.id.add_game_title_editText);
-            gameGenre = itemView.findViewById(R.id.add_game_genre_editText);
-            gameDate = itemView.findViewById(R.id.item_date);
-            itemView.setOnClickListener(this);
+
         }
 
         public void bindGame(VideoGame videoGame) {
             gameTitle.setText(videoGame.getGameTitle());
-            gameGenre.setText(videoGame.getGameGenre());
-            gameDate.setText(videoGame.getDate().toString());
+            gameGenre.setText(adapterCallback.getContext().getString(R.string.game_genre, videoGame.getGameGenre()));
+            if(videoGame.isCheckedOut()) {
+                //makes visible
+                gameDate.setVisibility(View.VISIBLE);
+                //set due date
+                videoGame.setDate(new Date());
+                rowLayout.setBackgroundResource(R.color.red);
+                int numberOfDays = 14;
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(videoGame.getDate());
+                calendar.add(Calendar.DAY_OF_YEAR,numberOfDays);
+                Date date = calendar.getTime();
+                SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy", Locale.US);
+                gameDate.setText(adapterCallback.getContext().getString(R.string.due_date, formatter.format(date)));
+
+            } else {
+                gameDate.setVisibility(View.INVISIBLE);
+                rowLayout.setBackgroundResource(R.color.green);
+            }
         }
-        @Override
-        public void onClick(View v) {
-            videoGamesList.get(getAdapterPosition()).setGameTitle("New name!");
-            notifyDataSetChanged();
+        public View.OnClickListener onClick(final VideoGame videoGame) {
+            return new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    adapterCallback.rowClicked(videoGame);
+                }
+            };
+        }
+        public View.OnLongClickListener onLongClick(final VideoGame videoGame) {
+            return new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    adapterCallback.rowLongClicked(videoGame);
+                    return true;
+                }
+            };
         }
     }
     public interface AdapterCallback {
-
+        Context getContext();
+        void rowClicked(VideoGame videoGame);
+        void rowLongClicked(VideoGame videoGame);
     }
 
 }
